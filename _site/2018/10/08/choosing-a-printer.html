@@ -1,0 +1,213 @@
+<h2 id="which-3d-printer-should-i-buy">Which 3D printer should I buy?</h2>
+
+<p>In this post I will explain my train of thought on buying my first 3D printer. Maybe this helps you in finding a 3d printer that suits you. Once a week I get asked on Instagram “which 3d printer should I buy?”. To save time in the future, I will reference to this post, or I have just referenced you to this page, after you asked ;).</p>
+
+<p><strong>Short answer:</strong> I can not answer this question for you.<br />
+<strong>Long answer:</strong> Maybe, reading this post will help.</p>
+
+<center>
+<img src="/assets/tree-printer.jpg" width="480px" />
+<br />
+<i>There are many factors that can influence your decision on which printer to build/buy.</i>
+<br />
+</center>
+
+<h2 id="why-get-a-3d-printer">Why get a 3D printer?</h2>
+
+<p>About one and a half years ago a friend of mine showed me a tiny OLED display on a breadboard, hooked to an esp8266 and a battery, showing the current temperature and humidity in the office.
+First of all, I had the immediate urge to build the same thing. But somehow nicer without all the cables poking around and the battery hanging loosely on a cable, asking to be ripped off.</p>
+
+<center>
+<img src="/assets/iod1-proto.jpg" width="480px" />
+<br />
+<i>First prototype.</i>
+<br />
+</center>
+
+<p>With this in mind, I thought about how I could build a case for this type of device. I did not consider 3D printing first, because I thought it would be too expensive. I would never pay 500€ just for an experiment that I was not sure would actually work out. I was wrong, especially about the price.</p>
+
+<p>So, the first case I built was a card board box. It did the trick, but was not really sturdy, and “mass production” (i.e. 10 pieces) did not sound like fun.
+Then, I played around with <a href="https://en.m.wikipedia.org/wiki/Polycaprolactone">Polycaprolactone</a>, a plastic material that comes in the form of pellets, that get’s soft as putty if you submerge it into hot water (60C), to model and form as desired. Although it was fun, it was a mess, with many many fingerprints on the outside of anything I made out of it.</p>
+
+<center>
+<img src="/assets/iod1-cardboard.jpg" width="480px" />
+<br />
+<i>Second prototype, in a cardboard case.</i>
+<br />
+</center>
+
+<p>Then, I stumbled across <a href="https://thingiverse.com">thingiverse.com</a> with all the amazing available designs that you can 3D print. Which made me realize how many possibilities a 3D printer gives you, to test, prototype, build, repair and improve things. Then, I watched a dozen videos on Youtube to get familiar with 3D printing.</p>
+
+<h2 id="choosing-the-technology-part-1">Choosing the technology, part 1</h2>
+
+<p>But, before I could answer the question “which printer should I buy?”, I needed to know what these printers actually do and how they work, which technologies exist and which are feasible for a hobbyist.</p>
+
+<p>The <a href="https://en.m.wikipedia.org/wiki/3D_printing_processes">Wikipedia page on 3D printing processes</a> will give you all the details, and I’m not going to repeat them here (also I haven’t read all of it). What I can say is that there are two technologies that are being used by hobbyists at the moment:</p>
+
+<ul>
+  <li><a href="https://en.m.wikipedia.org/wiki/Fused_filament_fabrication#Fused_deposition_modeling">Fused Deposition Modeling</a> (FDM), where your model gets printed bottom up, by depositing molten plastic in the right places, layer by layer:<br />
+ <img src="/assets/fdm.png" width="128px" /><br />
+(Source: <a href="https://commons.m.wikimedia.org/wiki/File:Schematic_representation_of_Fused_Filament_Fabrication_01.png#mw-jump-to-license">Paolo Cignoni, CC BY-SA 4.0</a>)</li>
+  <li><a href="https://en.m.wikipedia.org/wiki/Stereolithography">Stereolithography</a>, where your model gets printed top down, by solidifying a resin in the right places, layer by layer:<br />
+ <img src="/assets/sla.png" width="96px" /><br />
+(Source: <a href="https://commons.m.wikimedia.org/wiki/File:Schematic_representation_of_Stereolithography.png#mw-jump-to-license">Paolo Cignoni, CC BY-SA 4.0</a>)</li>
+</ul>
+
+<p>As this is the first branch in the decision tree on the question “Which 3D printer should I buy?”. I had to figure out the pros and cons of both technologies. After <a href="https://www.google.de/search?q=fdm+vs+sla">googling FDM vs SLA</a>, I came up with a list of points relevant to me:</p>
+
+<p><strong>FDM</strong></p>
+<ul>
+  <li>cheap</li>
+  <li>good for prototypes</li>
+  <li>lots of colors and materials (PLA, TPU, ABS, PETG)<br />
+<strong>SLA</strong></li>
+  <li>expensive</li>
+  <li>more detailed</li>
+</ul>
+
+<p>Also, I had the impression that work around SLA involved handling toxic resigns, cleaning and curing prints, which sounded too messy for me. Especially the warning labels on resins, and their toxicity did not appeal to me (<a href="https://www.fabbaloo.com/blog/2015/11/5/3d-printing-materials-toxicity-assessment-yes-toxic">source</a>).</p>
+
+<p>This does not mean that melting plastic does not create harmful fumes, which in fact it does. This is for example mentioned by <a href="https://www.engadget.com/2016/02/01/study-shows-some-3d-printing-fumes-can-be-harmful/?gucco-unter=1">engadget</a>, referencing a <a href="https://pubs.acs.org/doi/full/10.1021/acs.est.5b04983">research paper on acs.org</a>. (TL;DR: PLA is the least problematic, ABS the worst)</p>
+
+<p>But, comparing these points I made my decision: <strong>FDM</strong>. It seemed to be easier to handle, give more possible ways to experiment, with colors and materials, and the quality prints I found people managed to do with these types of printers was good enough for me. And it was cheaper.</p>
+
+<h2 id="choosing-a-technology-part-2">Choosing a technology, part 2</h2>
+
+<p>Now, obviously <code class="highlighter-rouge">printer != printer</code>, and I still did not know which printer I should buy. It was time to look at FDM printers in general and learn about their types.
+The principle of these types of printers is to move a print head in 3D space and place molten plastic, layer by layer, at the right location.</p>
+
+<p>The cheapest way of doing this would be a 3D pen, and rely on your own mechanics and skills of reproducing a 3D model. Might be fun for a few experiments, but not really if we want reproducible results. If you look at the sketch at the beginning of this post you will see why :D.</p>
+
+<p>The goal of any FDM printer design now is, to move the print head to any coordinate on your build area, a.k.a. the build plate or bed. This means, we need to be able to move across the build area (X- and,Y-axis, like a 2D printer) and lift the print head to the next layer (Z-axis, which gives us the 3rd dimension)</p>
+
+<p>There are three common concepts among hobbyist printers, which achieve exactly this:</p>
+
+<ul>
+  <li><strong>Cartesian:</strong>
+    <ul>
+      <li>moving the build area along the Y-axis</li>
+      <li>moving the print head along X-axis</li>
+      <li>moving the X-gantry along the Z-axis<br />
+<img src="/assets/cartesian.jpg" width="256px" /></li>
+    </ul>
+  </li>
+  <li><strong>CoreXY:</strong>
+    <ul>
+      <li>moving the print head along X- and Y-axis</li>
+      <li>moving the build area along the Z-axis<br />
+<img src="/assets/corexy.jpg" width="256px" /></li>
+    </ul>
+  </li>
+  <li><strong>Delta</strong>
+    <ul>
+      <li>moving the print head along X-, Y- and Z-axis<br />
+<img src="/assets/delta.jpg" width="256px" /></li>
+    </ul>
+  </li>
+</ul>
+
+<p>Again, there are more, but I don’t consider them to be applicable to hobbyist setups, and skip them for now. The systems presented above all have their _pro_s (and _con_s), which I summarize in the following (incomplete) table:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Type</th>
+      <th style="text-align: center">Movement of Build Area</th>
+      <th style="text-align: center">Benefits</th>
+      <th style="text-align: center">Drawbacks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">Cartesian</td>
+      <td style="text-align: center">along Y-axis</td>
+      <td style="text-align: center">good quality large community</td>
+      <td style="text-align: center">large desktop footprint</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">CoreXY</td>
+      <td style="text-align: center">along Z-axis</td>
+      <td style="text-align: center">best quality</td>
+      <td style="text-align: center">complex belt system</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Delta</td>
+      <td style="text-align: center">None</td>
+      <td style="text-align: center">highest speed, desktop footprint</td>
+      <td style="text-align: center">taller, more noise</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The <em>cartesian</em> design is one of the easiest designs, or the one with the biggest community. For me this an important point, as it helps a lot with debugging problems, because some has had this problem before.
+The drawback from this one is that the build area is moved along the Y-axis, resulting in ringing patterns visible on the prints on rapid/fast movements along this axis due to inertia.</p>
+
+<p>The <em>corexy</em> resolves the inertia issues of moving the build plate only along the Z-axis, i.e. the heavy weight is only moved in incremental, tiny steps with each layer change. Thus, the print quality can be better with this design.</p>
+
+<p>The <em>delta</em> design is supposedly the fastest as only the print head is moved, eliminating the X-gantry (saving weight), as well as avoiding build plate movements. The complexity of movements is handled by the firmware. Also, this setup has a round build plate, maximizing the print area versus required desktop area of the printer, saving space, where a <em>cartesian</em> model needs usually at least twice the build area.
+The movements of the print head are achieved by moving three stepper motors at the same time (versus two, in the other designs), so in theory this should be louder.</p>
+
+<p>Comparing these systems, my decision was <strong>cartesian</strong>. The quality lies between <em>corexy</em> and <em>delta</em>, but with more available printers to choose from manufacturers and support from the community.</p>
+
+<h2 id="kit-vs-assembled">Kit vs Assembled</h2>
+
+<p>Browsing through Amazon/Aliexpress/Ebay, I figured that you either buy a printer that is (partially assembled), or a kit.</p>
+
+<p>As I wanted to learn as much as possible about the printer setup, to be able to fix it and improve it on my own, I decided to buy a <strong>kit</strong>. The logic here was, if I manage to build it, I will definitely be able to fix it, as this only requires to get the broken part and replace it, as I would be already familiar with the printer.</p>
+
+<p>Also, after reading a lot of forums/user groups online, I noticed that 3D printing comes with a lot of problems, for example ringing, z-banding, slipping belts, etc. In this case knowing how your printer works, and having assembled it on your own, will give you enough clues to fix the problem yourself. If something does not work out 100% during a print, you might be able to have a better idea of what might be causing this.</p>
+
+<h2 id="size">Size</h2>
+
+<p>The next point was figuring out how big the printer should be. My preference was, for it to be as small as possible. But, as I had learned so far, it should definitely have a heated bed to avoid warping. Many of the smaller printer models, i.e. build area around 120x120mm did not come with a heated bed.</p>
+
+<p>My choice fell too a <strong>200x200mm build area</strong>, as this is big enough for most prints, but not too big to put it on a desk.</p>
+
+<h2 id="manufacturermodel">Manufacturer/Model</h2>
+
+<p>I solved this question by going on AliExpress, searching for “3D printer”, then sorting by number of orders to see the current trend of popular manufacturers.</p>
+
+<p>This left me with printers showing up from (in alphabetical order):</p>
+<ul>
+  <li>Anet</li>
+  <li>Anycubic</li>
+  <li>Creality</li>
+  <li>Tevo</li>
+</ul>
+
+<p>I then looked for printers that did not have an acrylic frame, because I did not like the look and considered the 20x20 aluminium profiles to be sturdier, and selected the cheapest model: the <strong>Tevo Tarantula</strong>.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>In the meantime I have printed a dozen add-ons to improve the printer which I have organized in a collection on thingiverse: <a href="https://www.thingiverse.com/uvwxy/collections/tevo-tarantula-improvements">https://www.thingiverse.com/uvwxy/collections/tevo-tarantula-improvements</a>. Most of these add-ons are not limited to my printer model (as they are all quite similar).</p>
+
+<p>I designed the card board case in Blender, which resulted in my first prints from my 3D printer:</p>
+
+<center>
+<img src="/assets/iod1-printed.jpg" width="480px" />
+<br />
+<i>Third prototype, in a 3D printed case.</i>
+<br />
+</center>
+
+<p>Nowadays, it feels like a new printer is released every week. If you look at them from a technical perspective they are not that different from each other. From my point of view, being able to customize them is an important feature. Especially, being able to flash an open source firmware (<a href="http://marlinfw.org">Marlin</a>), too.</p>
+
+<p>In the end, I believe it is not so much which printer you buy, but how much concentration went into the assembly, and maintenance you (sometimes) do, that makes a difference in print quality. I have seen excellent prints, as well really bad prints from every printer out there. And, also from mine.</p>
+
+<p>The more experience you gain in this area, the better your prints will be.</p>
+
+<h2 id="whats-next">What’s next?</h2>
+
+<p>So, before you can answer the question “Which 3D printer should I buy?”, you should ask yourself at least a few of the following questions:</p>
+<ul>
+  <li>How much experience do I have?</li>
+  <li>How much do I want to learn?</li>
+  <li>How big is my budget (time and money)?</li>
+  <li>How much am I going to print?</li>
+  <li>Will I pay more for filament then for a printer?</li>
+  <li>Do I know how to operate a 3D printer safely? (<a href="https://www.thingiverse.com/groups/anet-a8-prusa-i3/forums/general/topic:25274">“Anet A8 allmost burned down my house”</a>)</li>
+  <li>What quality do I expect from a printer?</li>
+  <li>What material do I want to print?</li>
+</ul>
+
+<p>Some of these question you can search online ;).</p>

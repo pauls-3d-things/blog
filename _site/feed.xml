@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2018-12-16T19:54:10+01:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Pauls 3D Things</title><subtitle>👨‍🔬 I'm a maker: 3D Printing, Electronics, Software 💡 Follow me on social media to stay up to date 🛠 Details and How-Tos will be on this website</subtitle><entry><title type="html">I2c In A Nutshell</title><link href="http://localhost:4000/2018/11/17/i2c-in-a-nutshell.html" rel="alternate" type="text/html" title="I2c In A Nutshell" /><published>2018-11-17T00:00:00+01:00</published><updated>2018-11-17T00:00:00+01:00</updated><id>http://localhost:4000/2018/11/17/i2c-in-a-nutshell</id><content type="html" xml:base="http://localhost:4000/2018/11/17/i2c-in-a-nutshell.html">&lt;h2 id=&quot;intro&quot;&gt;Intro&lt;/h2&gt;
+
+&lt;p&gt;An &lt;a href=&quot;https://www.arduino.cc/en/Guide/Introduction&quot;&gt;Arduino&lt;/a&gt;/&lt;a href=&quot;https://en.wikipedia.org/wiki/Microcontroller&quot;&gt;microcontroller&lt;/a&gt; itself is fun, and you can do the &lt;a href=&quot;https://learn.adafruit.com/adafruit-arduino-lesson-1-blink/loading-the-blink-example&quot;&gt;blink&lt;/a&gt; pretty fast, but as soon was we mastered the first steps we want to add more parts.&lt;/p&gt;
+
+&lt;p&gt;One way to add parts to your Arduino is by talking to them via I2C. Now, you can read all the (correct) details about this &lt;a href=&quot;https://en.wikipedia.org/wiki/Bus_(computing)&quot;&gt;bus&lt;/a&gt; on wikipedia here: &lt;a href=&quot;https://en.wikipedia.org/wiki/I%C2%B2C&quot;&gt;https://en.wikipedia.org/wiki/I%C2%B2C&lt;/a&gt; …&lt;/p&gt;
+
+&lt;p&gt;… or you can take the short version:&lt;/p&gt;
+
+&lt;p&gt;An I2C device usually has at least four pins:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;VCC&lt;/code&gt; (+)&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;GND&lt;/code&gt; (-)&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;SCL&lt;/code&gt; (clock)&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;SDA&lt;/code&gt; (data)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Now, the first two are obvious: we need a power supply (usually 3.3V or 5V check first). 
+The other two are also simple: Before we can talk (data: &lt;code class=&quot;highlighter-rouge&quot;&gt;SDA&lt;/code&gt;) via i2c, we need to be synchronized (clock: &lt;code class=&quot;highlighter-rouge&quot;&gt;SCL&lt;/code&gt;). Also, to make sure we don’t talk at the same time, we need our microcontroller (master), that tells exactly which device (slave) is supposed to do what (i.e. read/write data from/to an address).&lt;/p&gt;
+
+&lt;p&gt;A sensor would specify which address to read to get sensor data, a display would specifiy which addresses to write pixels to, to update the display.&lt;/p&gt;
+
+&lt;p&gt;The good thing is, there are tons of &lt;a href=&quot;https://www.arduino.cc/en/Main/Libraries&quot;&gt;Arduino libraries&lt;/a&gt; that do exactly this that  let us copy&amp;amp;paste our code really fast.&lt;/p&gt;
+
+&lt;center&gt;
+&lt;img src=&quot;/assets/i2c-examples.jpg&quot; width=&quot;480px&quot; /&gt;
+&lt;br /&gt;
+&lt;i&gt;Each I2C slave has an address. The pins VCC/GND/SCL/SDA are colored red/black/green/purple.&lt;/i&gt;
+&lt;br /&gt;
+&lt;/center&gt;
+
+&lt;h2 id=&quot;testing-i2c&quot;&gt;Testing I2C&lt;/h2&gt;
+
+&lt;p&gt;Before you start using a library, and wondering why it does not work, it’s always practical to first check if your setup actually works. My approach to this is:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;measure with a multi meter that all conections are correct&lt;/li&gt;
+  &lt;li&gt;run the &lt;a href=&quot;https://playground.arduino.cc/Main/I2cScanner&quot;&gt;i2c_scanner&lt;/a&gt; and look for the results:&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;center&gt;
+&lt;img src=&quot;/assets/i2c-scanner.png&quot; width=&quot;480px&quot; /&gt;
+&lt;br /&gt;
+&lt;i&gt;It's always good to verify the setup before coding the main application.&lt;/i&gt;
+&lt;br /&gt;
+&lt;/center&gt;
+
+&lt;p&gt;If all devices show up, then we are good to continue.&lt;/p&gt;
+
+&lt;h3 id=&quot;simple-i2c-example&quot;&gt;Simple I2C example&lt;/h3&gt;
+
+&lt;p&gt;The following example requires the &lt;a href=&quot;https://github.com/olikraus/u8g2&quot;&gt;u8g2 library&lt;/a&gt;. Install it via the library manager.&lt;/p&gt;
+
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
+&lt;span class=&quot;cp&quot;&gt;#include &amp;lt;U8g2lib.h&amp;gt;
+&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;U8G2_SSD1306_128X32_UNIVISION_F_HW_I2C&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;u8g2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;U8G2_R0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;cm&quot;&gt;/* reset=*/&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;U8X8_PIN_NONE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+
+&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;setup&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;u8g2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;begin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;loop&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;u8g2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;clearBuffer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;u8g2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;setFont&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;u8g2_font_ncenB08_tr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;u8g2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;drawStr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;LiPo Meter V0.0&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;u8g2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sendBuffer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;delay&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Result:&lt;/p&gt;
+
+&lt;center&gt;
+&lt;img src=&quot;/assets/i2c-result.jpg&quot; width=&quot;480px&quot; /&gt;
+&lt;br /&gt;
+&lt;i&gt;It's always good to verify the setup before coding the main application.&lt;/i&gt;
+&lt;br /&gt;
+&lt;/center&gt;</content><author><name></name></author><summary type="html">Intro</summary></entry><entry><title type="html">Choosing a 3D printer</title><link href="http://localhost:4000/2018/10/08/choosing-a-printer.html" rel="alternate" type="text/html" title="Choosing a 3D printer" /><published>2018-10-08T00:00:00+02:00</published><updated>2018-10-08T00:00:00+02:00</updated><id>http://localhost:4000/2018/10/08/choosing-a-printer</id><content type="html" xml:base="http://localhost:4000/2018/10/08/choosing-a-printer.html">&lt;h2 id=&quot;which-3d-printer-should-i-buy&quot;&gt;Which 3D printer should I buy?&lt;/h2&gt;
+
+&lt;p&gt;In this post I will explain my train of thought on buying my first 3D printer. Maybe this helps you in finding a 3d printer that suits you. Once a week I get asked on Instagram “which 3d printer should I buy?”. To save time in the future, I will reference to this post, or I have just referenced you to this page, after you asked ;).&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Short answer:&lt;/strong&gt; I can not answer this question for you.&lt;br /&gt;
+&lt;strong&gt;Long answer:&lt;/strong&gt; Maybe, reading this post will help.&lt;/p&gt;
+
+&lt;center&gt;
+&lt;img src=&quot;/assets/tree-printer.jpg&quot; width=&quot;480px&quot; /&gt;
+&lt;br /&gt;
+&lt;i&gt;There are many factors that can influence your decision on which printer to build/buy.&lt;/i&gt;
+&lt;br /&gt;
+&lt;/center&gt;
+
+&lt;h2 id=&quot;why-get-a-3d-printer&quot;&gt;Why get a 3D printer?&lt;/h2&gt;
+
+&lt;p&gt;About one and a half years ago a friend of mine showed me a tiny OLED display on a breadboard, hooked to an esp8266 and a battery, showing the current temperature and humidity in the office.
+First of all, I had the immediate urge to build the same thing. But somehow nicer without all the cables poking around and the battery hanging loosely on a cable, asking to be ripped off.&lt;/p&gt;
+
+&lt;center&gt;
+&lt;img src=&quot;/assets/iod1-proto.jpg&quot; width=&quot;480px&quot; /&gt;
+&lt;br /&gt;
+&lt;i&gt;First prototype.&lt;/i&gt;
+&lt;br /&gt;
+&lt;/center&gt;
+
+&lt;p&gt;With this in mind, I thought about how I could build a case for this type of device. I did not consider 3D printing first, because I thought it would be too expensive. I would never pay 500€ just for an experiment that I was not sure would actually work out. I was wrong, especially about the price.&lt;/p&gt;
+
+&lt;p&gt;So, the first case I built was a card board box. It did the trick, but was not really sturdy, and “mass production” (i.e. 10 pieces) did not sound like fun.
+Then, I played around with &lt;a href=&quot;https://en.m.wikipedia.org/wiki/Polycaprolactone&quot;&gt;Polycaprolactone&lt;/a&gt;, a plastic material that comes in the form of pellets, that get’s soft as putty if you submerge it into hot water (60C), to model and form as desired. Although it was fun, it was a mess, with many many fingerprints on the outside of anything I made out of it.&lt;/p&gt;
+
+&lt;center&gt;
+&lt;img src=&quot;/assets/iod1-cardboard.jpg&quot; width=&quot;480px&quot; /&gt;
+&lt;br /&gt;
+&lt;i&gt;Second prototype, in a cardboard case.&lt;/i&gt;
+&lt;br /&gt;
+&lt;/center&gt;
+
+&lt;p&gt;Then, I stumbled across &lt;a href=&quot;https://thingiverse.com&quot;&gt;thingiverse.com&lt;/a&gt; with all the amazing available designs that you can 3D print. Which made me realize how many possibilities a 3D printer gives you, to test, prototype, build, repair and improve things. Then, I watched a dozen videos on Youtube to get familiar with 3D printing.&lt;/p&gt;
+
+&lt;h2 id=&quot;choosing-the-technology-part-1&quot;&gt;Choosing the technology, part 1&lt;/h2&gt;
+
+&lt;p&gt;But, before I could answer the question “which printer should I buy?”, I needed to know what these printers actually do and how they work, which technologies exist and which are feasible for a hobbyist.&lt;/p&gt;
+
+&lt;p&gt;The &lt;a href=&quot;https://en.m.wikipedia.org/wiki/3D_printing_processes&quot;&gt;Wikipedia page on 3D printing processes&lt;/a&gt; will give you all the details, and I’m not going to repeat them here (also I haven’t read all of it). What I can say is that there are two technologies that are being used by hobbyists at the moment:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://en.m.wikipedia.org/wiki/Fused_filament_fabrication#Fused_deposition_modeling&quot;&gt;Fused Deposition Modeling&lt;/a&gt; (FDM), where your model gets printed bottom up, by depositing molten plastic in the right places, layer by layer:&lt;br /&gt;
+ &lt;img src=&quot;/assets/fdm.png&quot; width=&quot;128px&quot; /&gt;&lt;br /&gt;
+(Source: &lt;a href=&quot;https://commons.m.wikimedia.org/wiki/File:Schematic_representation_of_Fused_Filament_Fabrication_01.png#mw-jump-to-license&quot;&gt;Paolo Cignoni, CC BY-SA 4.0&lt;/a&gt;)&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://en.m.wikipedia.org/wiki/Stereolithography&quot;&gt;Stereolithography&lt;/a&gt;, where your model gets printed top down, by solidifying a resin in the right places, layer by layer:&lt;br /&gt;
+ &lt;img src=&quot;/assets/sla.png&quot; width=&quot;96px&quot; /&gt;&lt;br /&gt;
+(Source: &lt;a href=&quot;https://commons.m.wikimedia.org/wiki/File:Schematic_representation_of_Stereolithography.png#mw-jump-to-license&quot;&gt;Paolo Cignoni, CC BY-SA 4.0&lt;/a&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;As this is the first branch in the decision tree on the question “Which 3D printer should I buy?”. I had to figure out the pros and cons of both technologies. After &lt;a href=&quot;https://www.google.de/search?q=fdm+vs+sla&quot;&gt;googling FDM vs SLA&lt;/a&gt;, I came up with a list of points relevant to me:&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;FDM&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;cheap&lt;/li&gt;
+  &lt;li&gt;good for prototypes&lt;/li&gt;
+  &lt;li&gt;lots of colors and materials (PLA, TPU, ABS, PETG)&lt;br /&gt;
+&lt;strong&gt;SLA&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;expensive&lt;/li&gt;
+  &lt;li&gt;more detailed&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Also, I had the impression that work around SLA involved handling toxic resigns, cleaning and curing prints, which sounded too messy for me. Especially the warning labels on resins, and their toxicity did not appeal to me (&lt;a href=&quot;https://www.fabbaloo.com/blog/2015/11/5/3d-printing-materials-toxicity-assessment-yes-toxic&quot;&gt;source&lt;/a&gt;).&lt;/p&gt;
+
+&lt;p&gt;This does not mean that melting plastic does not create harmful fumes, which in fact it does. This is for example mentioned by &lt;a href=&quot;https://www.engadget.com/2016/02/01/study-shows-some-3d-printing-fumes-can-be-harmful/?gucco-unter=1&quot;&gt;engadget&lt;/a&gt;, referencing a &lt;a href=&quot;https://pubs.acs.org/doi/full/10.1021/acs.est.5b04983&quot;&gt;research paper on acs.org&lt;/a&gt;. (TL;DR: PLA is the least problematic, ABS the worst)&lt;/p&gt;
+
+&lt;p&gt;But, comparing these points I made my decision: &lt;strong&gt;FDM&lt;/strong&gt;. It seemed to be easier to handle, give more possible ways to experiment, with colors and materials, and the quality prints I found people managed to do with these types of printers was good enough for me. And it was cheaper.&lt;/p&gt;
+
+&lt;h2 id=&quot;choosing-a-technology-part-2&quot;&gt;Choosing a technology, part 2&lt;/h2&gt;
+
+&lt;p&gt;Now, obviously &lt;code class=&quot;highlighter-rouge&quot;&gt;printer != printer&lt;/code&gt;, and I still did not know which printer I should buy. It was time to look at FDM printers in general and learn about their types.
+The principle of these types of printers is to move a print head in 3D space and place molten plastic, layer by layer, at the right location.&lt;/p&gt;
+
+&lt;p&gt;The cheapest way of doing this would be a 3D pen, and rely on your own mechanics and skills of reproducing a 3D model. Might be fun for a few experiments, but not really if we want reproducible results. If you look at the sketch at the beginning of this post you will see why :D.&lt;/p&gt;
+
+&lt;p&gt;The goal of any FDM printer design now is, to move the print head to any coordinate on your build area, a.k.a. the build plate or bed. This means, we need to be able to move across the build area (X- and,Y-axis, like a 2D printer) and lift the print head to the next layer (Z-axis, which gives us the 3rd dimension)&lt;/p&gt;
+
+&lt;p&gt;There are three common concepts among hobbyist printers, which achieve exactly this:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;Cartesian:&lt;/strong&gt;
+    &lt;ul&gt;
+      &lt;li&gt;moving the build area along the Y-axis&lt;/li&gt;
+      &lt;li&gt;moving the print head along X-axis&lt;/li&gt;
+      &lt;li&gt;moving the X-gantry along the Z-axis&lt;br /&gt;
+&lt;img src=&quot;/assets/cartesian.jpg&quot; width=&quot;256px&quot; /&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;CoreXY:&lt;/strong&gt;
+    &lt;ul&gt;
+      &lt;li&gt;moving the print head along X- and Y-axis&lt;/li&gt;
+      &lt;li&gt;moving the build area along the Z-axis&lt;br /&gt;
+&lt;img src=&quot;/assets/corexy.jpg&quot; width=&quot;256px&quot; /&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Delta&lt;/strong&gt;
+    &lt;ul&gt;
+      &lt;li&gt;moving the print head along X-, Y- and Z-axis&lt;br /&gt;
+&lt;img src=&quot;/assets/delta.jpg&quot; width=&quot;256px&quot; /&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Again, there are more, but I don’t consider them to be applicable to hobbyist setups, and skip them for now. The systems presented above all have their _pro_s (and _con_s), which I summarize in the following (incomplete) table:&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th style=&quot;text-align: left&quot;&gt;Type&lt;/th&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;Movement of Build Area&lt;/th&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;Benefits&lt;/th&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;Drawbacks&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Cartesian&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;along Y-axis&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;good quality large community&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;large desktop footprint&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;CoreXY&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;along Z-axis&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;best quality&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;complex belt system&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Delta&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;None&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;highest speed, desktop footprint&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;taller, more noise&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;The &lt;em&gt;cartesian&lt;/em&gt; design is one of the easiest designs, or the one with the biggest community. For me this an important point, as it helps a lot with debugging problems, because some has had this problem before.
+The drawback from this one is that the build area is moved along the Y-axis, resulting in ringing patterns visible on the prints on rapid/fast movements along this axis due to inertia.&lt;/p&gt;
+
+&lt;p&gt;The &lt;em&gt;corexy&lt;/em&gt; resolves the inertia issues of moving the build plate only along the Z-axis, i.e. the heavy weight is only moved in incremental, tiny steps with each layer change. Thus, the print quality can be better with this design.&lt;/p&gt;
+
+&lt;p&gt;The &lt;em&gt;delta&lt;/em&gt; design is supposedly the fastest as only the print head is moved, eliminating the X-gantry (saving weight), as well as avoiding build plate movements. The complexity of movements is handled by the firmware. Also, this setup has a round build plate, maximizing the print area versus required desktop area of the printer, saving space, where a &lt;em&gt;cartesian&lt;/em&gt; model needs usually at least twice the build area.
+The movements of the print head are achieved by moving three stepper motors at the same time (versus two, in the other designs), so in theory this should be louder.&lt;/p&gt;
+
+&lt;p&gt;Comparing these systems, my decision was &lt;strong&gt;cartesian&lt;/strong&gt;. The quality lies between &lt;em&gt;corexy&lt;/em&gt; and &lt;em&gt;delta&lt;/em&gt;, but with more available printers to choose from manufacturers and support from the community.&lt;/p&gt;
+
+&lt;h2 id=&quot;kit-vs-assembled&quot;&gt;Kit vs Assembled&lt;/h2&gt;
+
+&lt;p&gt;Browsing through Amazon/Aliexpress/Ebay, I figured that you either buy a printer that is (partially assembled), or a kit.&lt;/p&gt;
+
+&lt;p&gt;As I wanted to learn as much as possible about the printer setup, to be able to fix it and improve it on my own, I decided to buy a &lt;strong&gt;kit&lt;/strong&gt;. The logic here was, if I manage to build it, I will definitely be able to fix it, as this only requires to get the broken part and replace it, as I would be already familiar with the printer.&lt;/p&gt;
+
+&lt;p&gt;Also, after reading a lot of forums/user groups online, I noticed that 3D printing comes with a lot of problems, for example ringing, z-banding, slipping belts, etc. In this case knowing how your printer works, and having assembled it on your own, will give you enough clues to fix the problem yourself. If something does not work out 100% during a print, you might be able to have a better idea of what might be causing this.&lt;/p&gt;
+
+&lt;h2 id=&quot;size&quot;&gt;Size&lt;/h2&gt;
+
+&lt;p&gt;The next point was figuring out how big the printer should be. My preference was, for it to be as small as possible. But, as I had learned so far, it should definitely have a heated bed to avoid warping. Many of the smaller printer models, i.e. build area around 120x120mm did not come with a heated bed.&lt;/p&gt;
+
+&lt;p&gt;My choice fell too a &lt;strong&gt;200x200mm build area&lt;/strong&gt;, as this is big enough for most prints, but not too big to put it on a desk.&lt;/p&gt;
+
+&lt;h2 id=&quot;manufacturermodel&quot;&gt;Manufacturer/Model&lt;/h2&gt;
+
+&lt;p&gt;I solved this question by going on AliExpress, searching for “3D printer”, then sorting by number of orders to see the current trend of popular manufacturers.&lt;/p&gt;
+
+&lt;p&gt;This left me with printers showing up from (in alphabetical order):&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Anet&lt;/li&gt;
+  &lt;li&gt;Anycubic&lt;/li&gt;
+  &lt;li&gt;Creality&lt;/li&gt;
+  &lt;li&gt;Tevo&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;I then looked for printers that did not have an acrylic frame, because I did not like the look and considered the 20x20 aluminium profiles to be sturdier, and selected the cheapest model: the &lt;strong&gt;Tevo Tarantula&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;In the meantime I have printed a dozen add-ons to improve the printer which I have organized in a collection on thingiverse: &lt;a href=&quot;https://www.thingiverse.com/uvwxy/collections/tevo-tarantula-improvements&quot;&gt;https://www.thingiverse.com/uvwxy/collections/tevo-tarantula-improvements&lt;/a&gt;. Most of these add-ons are not limited to my printer model (as they are all quite similar).&lt;/p&gt;
+
+&lt;p&gt;I designed the card board case in Blender, which resulted in my first prints from my 3D printer:&lt;/p&gt;
+
+&lt;center&gt;
+&lt;img src=&quot;/assets/iod1-printed.jpg&quot; width=&quot;480px&quot; /&gt;
+&lt;br /&gt;
+&lt;i&gt;Third prototype, in a 3D printed case.&lt;/i&gt;
+&lt;br /&gt;
+&lt;/center&gt;
+
+&lt;p&gt;Nowadays, it feels like a new printer is released every week. If you look at them from a technical perspective they are not that different from each other. From my point of view, being able to customize them is an important feature. Especially, being able to flash an open source firmware (&lt;a href=&quot;http://marlinfw.org&quot;&gt;Marlin&lt;/a&gt;), too.&lt;/p&gt;
+
+&lt;p&gt;In the end, I believe it is not so much which printer you buy, but how much concentration went into the assembly, and maintenance you (sometimes) do, that makes a difference in print quality. I have seen excellent prints, as well really bad prints from every printer out there. And, also from mine.&lt;/p&gt;
+
+&lt;p&gt;The more experience you gain in this area, the better your prints will be.&lt;/p&gt;
+
+&lt;h2 id=&quot;whats-next&quot;&gt;What’s next?&lt;/h2&gt;
+
+&lt;p&gt;So, before you can answer the question “Which 3D printer should I buy?”, you should ask yourself at least a few of the following questions:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;How much experience do I have?&lt;/li&gt;
+  &lt;li&gt;How much do I want to learn?&lt;/li&gt;
+  &lt;li&gt;How big is my budget (time and money)?&lt;/li&gt;
+  &lt;li&gt;How much am I going to print?&lt;/li&gt;
+  &lt;li&gt;Will I pay more for filament then for a printer?&lt;/li&gt;
+  &lt;li&gt;Do I know how to operate a 3D printer safely? (&lt;a href=&quot;https://www.thingiverse.com/groups/anet-a8-prusa-i3/forums/general/topic:25274&quot;&gt;“Anet A8 allmost burned down my house”&lt;/a&gt;)&lt;/li&gt;
+  &lt;li&gt;What quality do I expect from a printer?&lt;/li&gt;
+  &lt;li&gt;What material do I want to print?&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Some of these question you can search online ;).&lt;/p&gt;</content><author><name></name></author><summary type="html">Which 3D printer should I buy?</summary></entry></feed>

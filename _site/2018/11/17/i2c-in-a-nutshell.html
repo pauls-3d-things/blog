@@ -1,0 +1,80 @@
+<h2 id="intro">Intro</h2>
+
+<p>An <a href="https://www.arduino.cc/en/Guide/Introduction">Arduino</a>/<a href="https://en.wikipedia.org/wiki/Microcontroller">microcontroller</a> itself is fun, and you can do the <a href="https://learn.adafruit.com/adafruit-arduino-lesson-1-blink/loading-the-blink-example">blink</a> pretty fast, but as soon was we mastered the first steps we want to add more parts.</p>
+
+<p>One way to add parts to your Arduino is by talking to them via I2C. Now, you can read all the (correct) details about this <a href="https://en.wikipedia.org/wiki/Bus_(computing)">bus</a> on wikipedia here: <a href="https://en.wikipedia.org/wiki/I%C2%B2C">https://en.wikipedia.org/wiki/I%C2%B2C</a> …</p>
+
+<p>… or you can take the short version:</p>
+
+<p>An I2C device usually has at least four pins:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">VCC</code> (+)</li>
+  <li><code class="highlighter-rouge">GND</code> (-)</li>
+  <li><code class="highlighter-rouge">SCL</code> (clock)</li>
+  <li><code class="highlighter-rouge">SDA</code> (data)</li>
+</ul>
+
+<p>Now, the first two are obvious: we need a power supply (usually 3.3V or 5V check first). 
+The other two are also simple: Before we can talk (data: <code class="highlighter-rouge">SDA</code>) via i2c, we need to be synchronized (clock: <code class="highlighter-rouge">SCL</code>). Also, to make sure we don’t talk at the same time, we need our microcontroller (master), that tells exactly which device (slave) is supposed to do what (i.e. read/write data from/to an address).</p>
+
+<p>A sensor would specify which address to read to get sensor data, a display would specifiy which addresses to write pixels to, to update the display.</p>
+
+<p>The good thing is, there are tons of <a href="https://www.arduino.cc/en/Main/Libraries">Arduino libraries</a> that do exactly this that  let us copy&amp;paste our code really fast.</p>
+
+<center>
+<img src="/assets/i2c-examples.jpg" width="480px" />
+<br />
+<i>Each I2C slave has an address. The pins VCC/GND/SCL/SDA are colored red/black/green/purple.</i>
+<br />
+</center>
+
+<h2 id="testing-i2c">Testing I2C</h2>
+
+<p>Before you start using a library, and wondering why it does not work, it’s always practical to first check if your setup actually works. My approach to this is:</p>
+
+<ol>
+  <li>measure with a multi meter that all conections are correct</li>
+  <li>run the <a href="https://playground.arduino.cc/Main/I2cScanner">i2c_scanner</a> and look for the results:</li>
+</ol>
+
+<center>
+<img src="/assets/i2c-scanner.png" width="480px" />
+<br />
+<i>It's always good to verify the setup before coding the main application.</i>
+<br />
+</center>
+
+<p>If all devices show up, then we are good to continue.</p>
+
+<h3 id="simple-i2c-example">Simple I2C example</h3>
+
+<p>The following example requires the <a href="https://github.com/olikraus/u8g2">u8g2 library</a>. Install it via the library manager.</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="cp">#include &lt;U8g2lib.h&gt;
+</span>
+<span class="n">U8G2_SSD1306_128X32_UNIVISION_F_HW_I2C</span> <span class="n">u8g2</span><span class="p">(</span><span class="n">U8G2_R0</span><span class="p">,</span> <span class="cm">/* reset=*/</span> <span class="n">U8X8_PIN_NONE</span><span class="p">);</span>
+
+
+<span class="kt">void</span> <span class="nf">setup</span><span class="p">()</span> <span class="p">{</span>
+  <span class="n">u8g2</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">loop</span><span class="p">()</span> <span class="p">{</span>
+  <span class="n">u8g2</span><span class="p">.</span><span class="n">clearBuffer</span><span class="p">();</span>
+  <span class="n">u8g2</span><span class="p">.</span><span class="n">setFont</span><span class="p">(</span><span class="n">u8g2_font_ncenB08_tr</span><span class="p">);</span>
+  <span class="n">u8g2</span><span class="p">.</span><span class="n">drawStr</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="s">"LiPo Meter V0.0"</span><span class="p">);</span>
+  <span class="n">u8g2</span><span class="p">.</span><span class="n">sendBuffer</span><span class="p">();</span>
+  <span class="n">delay</span><span class="p">(</span><span class="mi">1000</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Result:</p>
+
+<center>
+<img src="/assets/i2c-result.jpg" width="480px" />
+<br />
+<i>It's always good to verify the setup before coding the main application.</i>
+<br />
+</center>
